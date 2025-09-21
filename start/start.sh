@@ -33,7 +33,7 @@ sleep 2
 
 # Publish initial pose in the first terminal
 echo "Publishing initial pose..."
-terminator -e "cd /home/cjh/zhujiang_ws && source devel/setup.bash && rostopic pub /start_lio std_msgs/Bool true --once" --new-tab -T "Initialization"
+terminator -e "cd /home/cjh/zhujiang3_ws && source devel/setup.bash && rostopic pub /start_lio std_msgs/Bool true --once" --new-tab -T "Initialization"
 sleep 15
 
 # Launch navigation
@@ -48,6 +48,6 @@ echo $password | sudo -S ip link set can0 up type can bitrate 500000
 
 # Configure CAN and launch Tracer
 echo "Configuring CAN interface and launching Tracer base..."
-terminator -e "cd /home/cjh/zhujiang_ws && source devel/setup.bash && roslaunch master_pkg start.launch" --new-tab -T "Master"
+terminator -e "cd /home/cjh/zhujiang3_ws && source devel/setup.bash && roslaunch master_pkg start.launch" --new-tab -T "Master"
 
 echo "All systems initialized successfully!"

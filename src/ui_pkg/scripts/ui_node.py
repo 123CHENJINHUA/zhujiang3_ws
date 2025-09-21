@@ -18,7 +18,7 @@ class UiNode:
         self.ui_get_client = rospy.ServiceProxy('/UI_get', ui_get)
 
         # 音频播放相关
-        self.voice_msgs_path = "/home/cjh/zhujiang_ws/src/ui_pkg/voice_msgs"
+        self.voice_msgs_path = "/home/cjh/zhujiang3_ws/src/ui_pkg/voice_msgs"
 
         self.sound = playsound(f'{self.voice_msgs_path}/{99}.wav', block=False)
 

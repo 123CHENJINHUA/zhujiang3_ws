@@ -179,7 +179,9 @@ void TaskManagerNode::sendDeliveryGoal(const std::vector<int>& task) {
             ROS_INFO("Delivery succeeded! info: %s", result->info.c_str());
             // 新增：如果完成，调用pickup服务
             if (result->info == "Finish") {
+                robot_voice(51);
                 ros::Duration(30.0).sleep(); 
+                robot_voice(52);
             }
         } else {
             ROS_INFO("Delivery succeeded! But result is null.");
@@ -218,11 +220,13 @@ void TaskManagerNode::sendGoBackGoal(const std::vector<int>& task){
             if (result->info == "Finish") {
                 robot_voice(17); // 17是我回来啦
             }
+
         } else {
             ROS_INFO("Delivery succeeded! But result is null.");
         }
     } else {
         ROS_WARN("Delivery failed!");
+        robot_voice(53); // 53是回收结束
     }
 }
 
@@ -262,6 +266,8 @@ void TaskManagerNode::taskAssignLoop() {
 
         while (!task_list_.empty()) {
 
+            robot_voice(50); // 50对应接收到回收任务
+
             // 发布任务分配信息
             task_status_ = "working";
             assignTask(task_list_);
@@ -298,8 +304,6 @@ void TaskManagerNode::robot_door_control(const std::string& msg) {
     door_control_pub_.publish(door_msg);
     ROS_INFO("Robot door control command sent: %s", msg.c_str());
 }
-
-
 
 // main函数
 int main(int argc, char** argv) {
