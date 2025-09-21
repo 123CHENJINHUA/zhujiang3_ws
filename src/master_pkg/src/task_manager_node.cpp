@@ -179,7 +179,7 @@ void TaskManagerNode::sendDeliveryGoal(const std::vector<int>& task) {
             ROS_INFO("Delivery succeeded! info: %s", result->info.c_str());
             // 新增：如果完成，调用pickup服务
             if (result->info == "Finish") {
-                ros::Duration(10.0).sleep(); // 等待1秒，确保门已打开
+                ros::Duration(30.0).sleep(); 
             }
         } else {
             ROS_INFO("Delivery succeeded! But result is null.");

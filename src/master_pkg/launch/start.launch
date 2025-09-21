@@ -2,6 +2,13 @@
     <!-- 启动tracer机器人底盘 -->
     <include file="$(find tracer_bringup)/launch/tracer_robot_base.launch" />
 
+    <!-- 启动手柄节点 -->
+    <node pkg="joy" type="joy_node" name="joy_node" output="screen">
+        <param name="dev" value="/dev/input/js0" />
+        <param name="deadzone" value="0.3" />
+        <param name="autorepeat_rate" value="20" />
+    </node>
+
     <!-- 再启动主控相关节点 -->
     <node pkg="master_pkg" type="task_manager_node" name="task_manager" output="screen" />
     <node pkg="ui_pkg" type="ui_node.py" name="ui" output="screen" />

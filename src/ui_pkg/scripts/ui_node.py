@@ -1,5 +1,6 @@
 import rospy
 from std_msgs.msg import String
+from sensor_msgs.msg import Joy
 import threading
 import queue
 import time
@@ -11,6 +12,8 @@ class UiNode:
     def __init__(self):
         # 订阅 /speach
         self.speach_sub = rospy.Subscriber("/speach", String, self.speach_callback)
+        # 订阅 /joy 手柄消息
+        self.joy_sub = rospy.Subscriber("/joy", Joy, self.joy_callback)
         # ui客户端
         self.ui_get_client = rospy.ServiceProxy('/UI_get', ui_get)
 
@@ -21,24 +24,49 @@ class UiNode:
 
         self.is_music = False  # 用于判断是否正在播放音乐
 
+        # 手柄按键状态跟踪
+        self.prev_a_button = 0  # 记录上一次A键状态，用于检测按键按下事件
+        self.prev_b_button = 0  # 记录上一次B键状态
+        self.prev_y_button = 0  # 记录上一次Y键状态
+        self.prev_x_button = 0  # 记录上一次X键状态
+
         # 创建音频播放线程
         self.audio_thread = threading.Thread(target=self._audio_worker, daemon=True)
         self.audio_thread.start()
-        
-        # 启动10秒后发送"1,1,1,1"
-        self.start_timer()
 
-    def start_timer(self):
-        """启动定时器，10秒后发送任务列表"""
-        timer = threading.Timer(10.0, self.send_initial_task)
-        timer.daemon = True
-        timer.start()
-        rospy.loginfo("Timer started, will send task list in 10 seconds")
-
-    def send_initial_task(self):
-        """发送初始任务列表"""
-        rospy.loginfo("Sending initial task list: 1,1,1,1")
-        self.call_ui_get("1,1,1,1")
+    def joy_callback(self, msg):
+        """处理手柄消息"""
+        try:
+            # PS2手柄按键映射（常见配置）：
+            # A键：索引0, B键：索引1, X键：索引2, Y键：索引3
+            if len(msg.buttons) >= 4:
+                current_a_button = msg.buttons[0]
+                current_b_button = msg.buttons[1]
+                current_x_button = msg.buttons[3]
+                
+                # 检测A键按下事件（从0变为1）
+                if current_a_button == 1 and self.prev_a_button == 0:
+                    rospy.loginfo("A button pressed, sending task list: 1,1,1,1")
+                    self.call_ui_get("1,1,1,1")
+                
+                # 检测B键按下事件
+                if current_b_button == 1 and self.prev_b_button == 0:
+                    rospy.loginfo("B button pressed, sending task list: 1,1,1,2")
+                    self.call_ui_get("1,1,1,2")
+                
+                # 检测X键按下事件
+                if current_x_button == 1 and self.prev_x_button == 0:
+                    rospy.loginfo("X button pressed, sending task list: 1,1,1,3")
+                    self.call_ui_get("1,1,1,3")
+                
+                
+                # 更新按键状态
+                self.prev_a_button = current_a_button
+                self.prev_b_button = current_b_button
+                self.prev_x_button = current_x_button
+            
+        except Exception as e:
+            rospy.logerr(f"Joy callback error: {e}")
 
     def _audio_worker(self):
         while not rospy.is_shutdown():
